@@ -1,4 +1,5 @@
 $(document).ready(function () {
+
     var filterFns = {
         numberGreaterThan50: function () {
             var number = $(this).find('.number').text();
