@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<section class="single-blog-area">
+    <div class="container">
+        <h1>  Добовление новости  </h1>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+<!--                {{ form.content }}-->
+
+
+
+            <button type="submit" class="btn btn-primary btn-block">Добавить новость</button>
+        </form>
+    </div>
+
+</section>
+
+{% endblock %}

@@ -9,5 +9,9 @@ urlpatterns = [
     path('tag/<str:slug>/', PostsByTag.as_view(), name='tag'),
     path('post/<str:slug>/', GetPost.as_view(), name='post'),
     path('search/', Search.as_view(), name='search'),
+    path('register/', register, name='register'),
+    path('login/', user_login, name='login'),
+    path('logout/', user_logout, name='logout'),
+    path('blog/add_news/', CreateNews.as_view(), name='add_news'),
 ]
 

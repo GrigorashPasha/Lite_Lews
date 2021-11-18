@@ -130,6 +130,7 @@ section.blog-post-area .big-text {
 
 section.blog-post-area img {
     width: 100%;
+    height: 100%;
 }
 
 section.blog-post-area .big-text h3 {
@@ -756,3 +757,5 @@ section.blog-post-area h4 span.author-name {
     width: 100px;
     height: auto;
 }
+
+
