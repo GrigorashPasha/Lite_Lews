@@ -1,0 +1,33 @@
+{% for post in posts %}
+<section class="blog-post-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="single-post">
+
+                    {% if post.photo %}
+                    <img src="{{ post.photo.url }}" alt="{{ post.title }}">
+                    {% else %}
+                    <img src="https://picsum.photos/id/1060/300/201/?blur=2" alt="{{ post.title }}">
+                    {% endif %}
+
+                    <h3><a href="{{ post.get_absolute_url }}">{{ post.title|truncatewords_html:5|safe }}</a></h3>
+                    <h4><span>Posted By: <span class="author-name">{{ post.author }}</span></span>
+                    </h4>
+                    {{ post.content|truncatewords_html:20|safe }}
+                    <h4><span>{{ post.created_at|date:"d.m.Y" }}</span></h4>
+<!--                    <a href="{% url 'update_news' post.slug %}" class="nav-link px-2 text-white">Update news</a></button>-->
+                </div>
+                  <div class="form-group">
+                      <button class="btn btn-outline-info" type="submit">
+                          <a href="{% url 'update_news' post.slug %}" class="nav-link px-2 text-white">Update</a>
+                      </button>
+                      <button class="btn btn-outline-info" type="submit">
+                        <a href="{% url 'delete_news' post.slug %}" class="nav-link px-2 text-white">Delete</a>
+                      </button>
+                  </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endfor %}

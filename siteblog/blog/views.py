@@ -1,12 +1,12 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.views.generic.edit import FormMixin
 
 from .models import Post, Category, Tag, Comment
 from django.db.models import F
-from .forms import UserRegisterForm, UserLoginForm, NewsForm, CommentForm, UserUpdateForm, ProfileUpdateForm
+from .forms import UserRegisterForm, UserLoginForm, NewsForm, CommentForm, UserUpdateForm, ProfileUpdateForm, UpdateNewsForm
 from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -15,6 +15,21 @@ from django.contrib.auth.decorators import login_required
 class CreateNews(CreateView):
     form_class = NewsForm
     template_name = 'blog/add_news.html'
+
+
+class UpdateNews(UpdateView):
+    model = Post
+    form_class = UpdateNewsForm
+    template_name = 'blog/update_news.html'
+
+    def get_success_url(self):
+        return reverse_lazy('post', kwargs={'slug': self.get_object().slug})
+
+
+class DeleteNews(DeleteView):
+    model = Post
+    template_name = 'blog/delete_news.html'
+    success_url = reverse_lazy('home')
 
 
 class Home(ListView):

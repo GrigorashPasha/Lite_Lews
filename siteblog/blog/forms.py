@@ -32,6 +32,14 @@ class NewsForm(forms.ModelForm):
         fields = '__all__'
 
 
+class UpdateNewsForm(forms.ModelForm):
+    content = forms.CharField(widget=CKEditorUploadingWidget, label='')
+
+    class Meta:
+        model = Post
+        fields = '__all__'
+
+
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment

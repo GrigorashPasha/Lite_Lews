@@ -14,7 +14,7 @@ urlpatterns = [
     path('logout/', user_logout, name='logout'),
     path('profile/', user_profile, name='profile'),
     path('blog/add_news/', CreateNews.as_view(), name='add_news'),
-
+    path('blog/<str:slug>/', UpdateNews.as_view(), name='update_news'),
+    path('blog/<str:slug>/delete_news/', DeleteNews.as_view(), name='delete_news'),
 
 ]
-
