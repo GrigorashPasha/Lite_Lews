@@ -1,10 +1,15 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
-from .models import Post, Category, Tag
+from django.views.generic.edit import FormMixin
+
+from .models import Post, Category, Tag, Comment
 from django.db.models import F
-from .forms import UserRegisterForm, UserLoginForm, NewsForm, CommentForm
+from .forms import UserRegisterForm, UserLoginForm, NewsForm, CommentForm, UserUpdateForm, ProfileUpdateForm
 from django.contrib import messages
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 
 
 class CreateNews(CreateView):
@@ -54,10 +59,11 @@ class PostsByTag(ListView):
         return context
 
 
-class GetPost(DetailView):
+class GetPost(FormMixin, DetailView):
     model = Post
     template_name = 'blog/single.html'
     context_object_name = 'post'
+    form_class = CommentForm
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -65,6 +71,23 @@ class GetPost(DetailView):
         self.object.save()
         self.object.refresh_from_db()
         return context
+
+    def get_success_url(self):
+        return reverse_lazy('post', kwargs={'slug': self.get_object().slug})
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.post = self.get_object()
+        self.object.author = self.request.user
+        self.object.save()
+        return super().form_valid(form)
 
 
 class Search(ListView):
@@ -102,7 +125,7 @@ def user_login(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('home')
+            return redirect('profile')
     else:
         form = UserLoginForm()
     return render(request, 'blog/login.html', {'form': form})
@@ -113,31 +136,26 @@ def user_logout(request):
     return redirect('login')
 
 
-def post_detail(request, year, month, day, post):
-    post = get_object_or_404(Post, slug=post,
-                             status='published',
-                             publish__year=year,
-                             publish__month=month,
-                             publish__day=day)
-
-    # Список активных комментариев к этой записи
-    comments = post.comments.filter(active=True)
-    new_comment = None
+@login_required
+def user_profile(request):
     if request.method == 'POST':
-        # Комментарий был опубликован
-        comment_form = CommentForm(data=request.POST)
-        if comment_form.is_valid():
-            # Создайте объект Comment, но пока не сохраняйте в базу данных
-            new_comment = comment_form.save(commit=False)
-            # Назначить текущий пост комментарию
-            new_comment.post = post
-            # Сохранить комментарий в базе данных
-            new_comment.save()
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        p_form = ProfileUpdateForm(request.POST,
+                                   request.FILES,
+                                   instance=request.user.profile)
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            messages.success(request, f'Your account has been updated!')
+            return redirect('profile')
+
     else:
-        comment_form = CommentForm()
-    return render(request,
-                  'blog/single.html',
-                  {'post': post,
-                   'comments': comments,
-                   'new_comment': new_comment,
-                   'comment_form': comment_form})
+        u_form = UserUpdateForm(instance=request.user)
+        p_form = ProfileUpdateForm(instance=request.user.profile)
+
+    context = {
+        'u_form': u_form,
+        'p_form': p_form,
+    }
+
+    return render(request, 'blog/profile.html', context)

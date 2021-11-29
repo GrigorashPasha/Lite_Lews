@@ -73,8 +73,8 @@
                                             </header>
                                             <section class="comment-details">
                                                 <div class="author-name">
-                                                    <h5>{{ comment.name }}</a></h5>
-                                                    <p>{{ comment.created_on }}</p>
+                                                    <h5>{{ user.username }}</a></h5>
+                                                    <p>{{ comment.created }}</p>
                                                 </div>
                                                 <div class="comment-body">
                                                     <p>{{ comment.body | linebreaks }}</p>
@@ -145,27 +145,37 @@
 <!--                                        </article>-->
 <!--                                    </li>-->
 <!--                                </ul>-->
+                            {% if request.user.is_authenticated %}
+                              <form action="" method="post">
+                                    {% csrf_token %}
+                                    {{ form.as_p }}
+                                    <button type="submit">Отправить</button>
+                              </form>
+                            {% else %}
+                            <div class="panel-body">
+                                Только авторизованные пользователи могут оставлять комментарии<br/>
+                            </div>
+                            {% endif %}
 
-                    {% if new_comment %}
-                      <h2>Your comment has been added.</h2>
-                    {% else %}
-                            <form action="" method="post">
-                                {% csrf_token %}
-                                {{ comment_form.as_p}}
-                                <div class="name">
-                                    <input type="text" name="" id="" placeholder="Name" class="name">
-                                </div>
-                                <div class="email">
-                                    <input type="email" name="" id="" placeholder="Email" class="email">
-                                </div>
-                                <div class="comment">
-                                    <input type="text" name="" id="" placeholder="Comment" class="comment">
-                                </div>
-                                <div class="post">
-                                    <input type="submit" value="Post">
-                                </div>
-                            </form>
-{% endif %}
+
+
+<!--                            <form action="" method="post">-->
+<!--                                {% csrf_token %}-->
+<!--                                {{ comment_form.as_p}}-->
+<!--                                <div class="name">-->
+<!--                                    <input type="text" name="" id="" placeholder="Name" class="name">-->
+<!--                                </div>-->
+<!--                                <div class="email">-->
+<!--                                    <input type="email" name="" id="" placeholder="Email" class="email">-->
+<!--                                </div>-->
+<!--                                <div class="comment">-->
+<!--                                    <input type="text" name="" id="" placeholder="Comment" class="comment">-->
+<!--                                </div>-->
+<!--                                <div class="post">-->
+<!--                                    <input type="submit" value="Post">-->
+<!--                                </div>-->
+<!--                            </form>-->
+
                         </div>
                     </div>
 
